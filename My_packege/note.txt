@@ -1,0 +1,14 @@
+需要handle模块 用于功能处理
+manager模块 用于管理资源
+entity模块 实体
+collision模块 处理碰撞（也许可以放在handle里面？） 
+event模块 是否需要是一个问题
+component 组件？（比如说把texture tile 放进来？）
+
+Engine.h .cpp 整个游戏的基类
+
+然后渲染器需要抽取出来还暂时没想好怎么抽取
+
+LWindow 也需要将handleevent里面的需要更新渲染的部分更新一下 抽取出来 同样添加 update 和 draw
+
+后续可以搞一个计时器管理类 负责处理异步时间通知 也许

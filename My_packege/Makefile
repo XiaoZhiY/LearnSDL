@@ -32,7 +32,7 @@ LIBFLAGS := -Debug
 # ---------------------------------------------------------------------------	
 #                   directories
 # ---------------------------------------------------------------------------
-SRC_DIR := . ./Graphics ./Utils
+SRC_DIR := ./Graphics ./Utils .
 OBJ_DIR := ./obj
 INC_DIR := D:/dev/include/SDL2 D:/dev/include/SDL2_image D:/dev/include/SDL2_ttf D:/dev/include/SDL2_mixer
 LIB_DIR := D:/dev/lib
