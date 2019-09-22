@@ -1,48 +1,90 @@
-VPATH = ./Graphics:./obj
+# ---------------------------------------------------------------------------
+#                   commands
+# ---------------------------------------------------------------------------
+CC := g++
+LINK := g++
+RM := rm -rf
+MV := mv
+TAR := tar
+MKDIR := mkdir
 
-#CC specifies which compiler we're using
-CC = g++
 
-#INCLUDE_PATHS specifies the additional include paths we'll need
-INCLUDE_PATHS = -ID:/dev/include/SDL2 -ID:/dev/include/SDL2_image -ID:/dev/include/SDL2_ttf -ID:/dev/include/SDL2_mixer
+# ---------------------------------------------------------------------------
+#                   settings
+# ---------------------------------------------------------------------------
+SRC_SUFFIX := .cpp
+OBJ_SUFFIX := .o
+LIB_SUFFIX := .a
+BIN_SUFFIX := .exe
+DLL_SUFFIX := .so
 
-#LIBRARY_PATHS specifies the additional library paths we'll need
-LIBRARY_PATHS = -LD:/dev/lib
+INC_PREFIX := -I
+LIB_PREFIX := -L
+
+OPT_C := -c
+OPT_OUT := -o 
+OPT_LINKOUT := -o 
+
+CFLAGS := $(OPT_C)
+LIBFLAGS := -Debug
+
+
+# ---------------------------------------------------------------------------	
+#                   directories
+# ---------------------------------------------------------------------------
+SRC_DIR := . ./Graphics ./Utils
+OBJ_DIR := ./obj
+INC_DIR := D:/dev/include/SDL2 D:/dev/include/SDL2_image D:/dev/include/SDL2_ttf D:/dev/include/SDL2_mixer
+LIB_DIR := D:/dev/lib
+BIN_DIR := ./bin/
+
+
+# ---------------------------------------------------------------------------
+#                   common settings
+# ---------------------------------------------------------------------------
+# 将所有SRC_DIR中的.cpp文件取出
+SRCS := $(foreach var, $(SRC_DIR), $(wildcard $(var)/*$(SRC_SUFFIX)))
+
+# 对SRC_DIR中的.cpp文件生成对应的.o文件名 放到其原本在的目录下
+OBJS := $(patsubst %$(SRC_SUFFIX), %$(OBJ_SUFFIX),$(SRCS)) 
+
+# 对SRC_DIR中的.cpp文件生成对应的.o文件名 放到OBJ_DIR下
+#OBJS := $(foreach var, $(SRC_DIR), $(patsubst $(var)/%$(SRC_SUFFIX),$(OBJ_DIR)/%$(OBJ_SUFFIX),$(wildcard $(var)/*$(SRC_SUFFIX))))
+
+# -I 
+INCS := $(foreach var, $(INC_DIR), $(addprefix $(INC_PREFIX), $(var)))
+
+# -L
+LIBS := $(addprefix $(LIB_PREFIX), $(LIB_DIR))
+
+# -l
+LINKERS := -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 
 #COMPILER_FLAGS specifies the additional compilation options we're using
 # -w suppresses all warnings
 # -Wl,-subsystem,windows gets rid of the console window
-COMPILER_FLAGS = -w -Wl,-subsystem,windows
+COMPILER_FLAGS = -w #-Wl,-subsystem,windows
 
-#LINKER_FLAGS specifies the libraries we're linking against
-LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -l SDL2_mixer
-
-#OBJ_NAME specifies the name of our exectuable
-OBJ_NAME = test
-
-#EXECUTE FILE DIR
-OUTPUT_PATH = ./bin/
-
-#OBJS specifies which files to compile as part of the project
-OBJS = test.o LWindows.o LTexture.o
+TEMPFILES  := core core.* *$(OBJ_SUFFIX) temp.* *.out typescript*
 
 
 
-$(OBJ_NAME): $(OBJS)
-	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OUTPUT_PATH)$(OBJ_NAME)
+# ---------------------------------------------------------------------------
+#                   make rule
+# ---------------------------------------------------------------------------
+TARGET := test
 
-LWindows.o: LWindows.cpp
-	$(CC) -c $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $<
-LTexture.o: LTexture.cpp
-	$(CC) -c $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $<
-test.o: test.cpp
-	$(CC) -c $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $<
-#This is the target that compiles our executable
-#all : $(OBJS)
-#	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OUTPUT_PATH)$(OBJ_NAME)
+.PHONY: all clean
 
+all: $(TARGET)
+
+clean:
+	$(RM) $(BIN_DIR)$(TARGET)$(BIN_SUFFIX) $(OBJS)
+
+$(TARGET):$(OBJS)
+	$(LINK) $(OBJS) $(COMPILER_FLAGS) $(INCS) $(LIBS) $(LINKERS) $(OPT_LINKOUT)$(BIN_DIR)$(TARGET)$(BIN_SUFFIX)
+
+$(OBJS):%.o:%.cpp
+	$(CC) $(CFLAGS) $(COMPILER_FLAGS) $(INCS) $(LIBS) $(LINKERS) $(OPT_OUT)$@ $<
 
 	
-.PHONY: clean
-clean:
-	rm *.o ./bin/*.exe
